@@ -1,0 +1,298 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Flow · 登录系统</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface-warm: #fbfbfd;
+    --fg: #1d1d1f;
+    --fg-2: #424245;
+    --muted: #6e6e73;
+    --meta: #86868b;
+    --border: #d2d2d7;
+    --border-soft: #e8e8ed;
+    --accent: #0071e3;
+    --accent-on: #ffffff;
+    --accent-hover: #0077ed;
+    --accent-active: #0066cc;
+    --success: #16a34a;
+    --font-display: "SF Pro Display", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-body: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-pill: 980px;
+    --motion-fast: 150ms;
+    --motion-base: 220ms;
+    --ease-standard: cubic-bezier(0.28, 0, 0.22, 1);
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
+    --container-max: 1024px;
+    --container-gutter-desktop: 22px;
+    --container-gutter-tablet: 18px;
+    --container-gutter-phone: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--surface);
+    color: var(--fg);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 var(--container-gutter-desktop);
+  }
+
+  /* Nav */
+  .nav {
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--border-soft);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .nav-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 var(--container-gutter-desktop);
+    height: 52px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-brand {
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 600;
+    color: var(--fg); letter-spacing: -0.01em;
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  .nav-brand .dot {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .nav-brand .dot svg { width: 16px; height: 16px; fill: white; }
+  .nav-links { display: flex; gap: var(--space-6); }
+  .nav-links a {
+    font-size: 14px; color: var(--fg-2); text-decoration: none;
+    font-weight: 500; transition: color var(--motion-fast) var(--ease-standard);
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 80px 0 48px;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: 48px; font-weight: 600;
+    color: var(--fg);
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    margin-bottom: 12px;
+  }
+  .hero .highlight { color: var(--accent); }
+  .hero p {
+    font-size: 19px; color: var(--muted);
+    line-height: 1.47; max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* Screen cards */
+  .screens {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    padding-bottom: 80px;
+  }
+  .screen-card {
+    background: var(--bg);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03);
+    transition: box-shadow var(--motion-base) var(--ease-standard), transform var(--motion-base) var(--ease-standard);
+    text-decoration: none; color: inherit;
+    display: block;
+  }
+  .screen-card:hover {
+    box-shadow: 0 12px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+    transform: translateY(-2px);
+  }
+  .screen-card:active { transform: translateY(0); }
+  .card-preview {
+    height: 200px;
+    background: var(--surface-warm);
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid var(--border-soft);
+    position: relative; overflow: hidden;
+  }
+  .card-preview .mock {
+    width: 240px; height: 160px;
+    background: var(--bg);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px;
+  }
+  .mock-line {
+    height: 8px; background: var(--border-soft); border-radius: 4px;
+  }
+  .mock-line.short { width: 80px; }
+  .mock-line.med { width: 140px; }
+  .mock-line.long { width: 180px; }
+  .mock-btn {
+    width: 160px; height: 32px;
+    background: var(--accent); border-radius: var(--radius-pill);
+    margin-top: 4px;
+  }
+  .card-body { padding: var(--space-6); }
+  .card-body h3 {
+    font-family: var(--font-display);
+    font-size: 19px; font-weight: 600;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .card-body p {
+    font-size: 14px; color: var(--muted);
+    line-height: 1.47;
+  }
+  .card-badge {
+    display: inline-block;
+    font-size: 12px; font-weight: 600;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklab, var(--accent), transparent 92%);
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 32px 0;
+    border-top: 1px solid var(--border-soft);
+    font-size: 13px; color: var(--meta);
+  }
+
+  @media (max-width: 800px) {
+    .screens { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+    .hero { padding: 48px 0 32px; }
+    .hero h1 { font-size: 36px; }
+    .hero p { font-size: 17px; }
+    .container { padding: 0 var(--container-gutter-tablet); }
+    .nav-inner { padding: 0 var(--container-gutter-tablet); }
+  }
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 28px; }
+    .container { padding: 0 var(--container-gutter-phone); }
+    .nav-inner { padding: 0 var(--container-gutter-phone); }
+    .nav-links { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span class="dot">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="white" stroke-width="2"/><path d="M12 6v6l4 2" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+      Flow
+    </a>
+    <div class="nav-links">
+      <a href="login.html">登录</a>
+      <a href="register.html">注册</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <section class="hero">
+    <h1>简洁的<span class="highlight">登录体验</span></h1>
+    <p>手机号 + 验证码一键登录，支持 Apple / Google 社交账号，完整覆盖登录、注册、找回密码流程。</p>
+  </section>
+
+  <div class="screens">
+    <a href="login.html" class="screen-card">
+      <div class="card-preview">
+        <div class="mock">
+          <div class="mock-line short"></div>
+          <div class="mock-line med"></div>
+          <div class="mock-line long"></div>
+          <div class="mock-line med"></div>
+          <div class="mock-line long"></div>
+          <div class="mock-btn"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="card-badge">手机号 + 验证码</span>
+        <h3>登录</h3>
+        <p>使用手机号接收验证码快速登录，也支持 Apple 和 Google 社交账号登录。</p>
+      </div>
+    </a>
+
+    <a href="register.html" class="screen-card">
+      <div class="card-preview">
+        <div class="mock">
+          <div class="mock-line short"></div>
+          <div class="mock-line med"></div>
+          <div class="mock-line long"></div>
+          <div class="mock-line long"></div>
+          <div class="mock-line med"></div>
+          <div class="mock-btn"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="card-badge">创建账号</span>
+        <h3>注册</h3>
+        <p>输入手机号获取验证码，设置昵称，同意服务条款即可完成注册。</p>
+      </div>
+    </a>
+
+    <a href="forgot-password.html" class="screen-card">
+      <div class="card-preview">
+        <div class="mock">
+          <div class="mock-line short"></div>
+          <div class="mock-line short"></div>
+          <div class="mock-line short"></div>
+          <div class="mock-line med"></div>
+          <div class="mock-line long"></div>
+          <div class="mock-btn"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="card-badge">三步重置</span>
+        <h3>忘记密码</h3>
+        <p>通过手机验证码验证身份，三步完成密码重置：验证 → 设置新密码 → 完成。</p>
+      </div>
+    </a>
+  </div>
+</div>
+
+<footer class="footer">
+  <span>Flow 登录系统 · Apple Design System · 响应式网页</span>
+</footer>
+
+</body>
+</html>

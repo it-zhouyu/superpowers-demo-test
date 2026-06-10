@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>注册</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface-warm: #fbfbfd;
+    --fg: #1d1d1f;
+    --fg-2: #424245;
+    --muted: #6e6e73;
+    --meta: #86868b;
+    --border: #d2d2d7;
+    --border-soft: #e8e8ed;
+    --accent: #0071e3;
+    --accent-on: #ffffff;
+    --accent-hover: #0077ed;
+    --accent-active: #0066cc;
+    --error: #dc2626;
+    --success: #16a34a;
+    --font-display: "SF Pro Display", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-body: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-pill: 980px;
+    --motion-fast: 150ms;
+    --motion-base: 220ms;
+    --ease-standard: cubic-bezier(0.28, 0, 0.22, 1);
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--surface);
+    color: var(--fg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg);
+    border-radius: var(--radius-lg);
+    padding: 40px 36px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .logo-area { text-align: center; margin-bottom: var(--space-8); }
+  .logo {
+    width: 48px; height: 48px;
+    background: var(--accent);
+    border-radius: var(--radius-md);
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo svg { width: 26px; height: 26px; fill: white; }
+  .app-name {
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 600;
+    color: var(--fg); letter-spacing: -0.01em;
+  }
+
+  .header { text-align: center; margin-bottom: var(--space-8); }
+  .header h1 {
+    font-family: var(--font-display);
+    font-size: 28px; font-weight: 600;
+    color: var(--fg); letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 15px; color: var(--muted); line-height: 1.47;
+  }
+
+  .form { display: flex; flex-direction: column; gap: 18px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 13px; font-weight: 600; color: var(--fg);
+  }
+
+  /* Input */
+  .input-wrap input {
+    width: 100%; height: 48px;
+    padding: 0 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 16px; color: var(--fg);
+    background: var(--bg);
+    font-family: var(--font-body);
+    transition: border-color var(--motion-fast) var(--ease-standard);
+  }
+  .input-wrap input:focus { outline: none; border-color: var(--accent); }
+  .input-wrap input::placeholder { color: var(--meta); }
+
+  .phone-row { display: flex; gap: 8px; }
+  .country-pick {
+    width: 92px; min-width: 92px; height: 48px;
+    padding: 0 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 15px; color: var(--fg);
+    background: var(--bg);
+    display: flex; align-items: center; gap: 6px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: border-color var(--motion-fast) var(--ease-standard);
+  }
+  .country-pick:hover { border-color: var(--meta); }
+  .phone-row input { flex: 1; }
+
+  .code-row { display: flex; gap: 8px; }
+  .code-row input {
+    flex: 1; height: 48px;
+    padding: 0 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 16px; color: var(--fg);
+    background: var(--bg);
+    font-family: var(--font-body);
+    letter-spacing: 0.15em; text-align: center;
+    transition: border-color var(--motion-fast) var(--ease-standard);
+  }
+  .code-row input:focus { outline: none; border-color: var(--accent); }
+  .code-row input::placeholder { color: var(--meta); letter-spacing: 0; }
+
+  .btn-send {
+    min-width: 120px; height: 48px;
+    padding: 0 14px;
+    border: 1.5px solid var(--accent);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--accent);
+    font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    font-family: var(--font-body);
+    white-space: nowrap;
+    transition: all var(--motion-fast) var(--ease-standard);
+  }
+  .btn-send:hover { background: color-mix(in oklab, var(--accent), transparent 92%); }
+  .btn-send:disabled {
+    border-color: var(--border); color: var(--muted);
+    cursor: not-allowed; background: transparent;
+  }
+
+  .btn-primary {
+    width: 100%; height: 50px;
+    background: var(--accent);
+    color: var(--accent-on);
+    border: none;
+    border-radius: var(--radius-pill);
+    font-size: 16px; font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: var(--font-body);
+    transition: background-color var(--motion-fast) var(--ease-standard);
+    margin-top: 2px;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:active { background: var(--accent-active); }
+  .btn-primary:disabled { background: #a1c6f0; cursor: not-allowed; }
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Agreement checkbox */
+  .agree-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; color: var(--muted); line-height: 1.5;
+  }
+  .agree-row input[type="checkbox"] {
+    width: 18px; height: 18px; margin-top: 1px;
+    accent-color: var(--accent); cursor: pointer;
+    flex-shrink: 0;
+  }
+  .agree-row a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .agree-row a:hover { text-decoration: underline; }
+
+  .field-msg {
+    font-size: 12px; margin-top: 2px; display: none;
+  }
+  .field.has-error input,
+  .field.has-error .country-pick { border-color: var(--error); }
+  .field.has-error .field-msg.error { display: block; color: var(--error); }
+  .field-msg.hint { display: block; color: var(--muted); }
+
+  .links {
+    display: flex; justify-content: center; gap: 24px;
+    margin-top: 20px; font-size: 14px;
+  }
+  .links a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .links a:hover { text-decoration: underline; }
+
+  .toast {
+    position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--fg); color: white;
+    padding: 12px 24px; border-radius: var(--radius-pill);
+    font-size: 14px; font-weight: 500;
+    opacity: 0; transition: opacity var(--motion-base) var(--ease-standard);
+    pointer-events: none; z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 480px) {
+    body { padding: 16px; align-items: flex-start; padding-top: 60px; }
+    .card { padding: 32px 24px; border-radius: var(--radius-md); box-shadow: none; }
+    .header h1 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-area">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="white" stroke-width="2"/><path d="M12 6v6l4 2" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="app-name">流</div>
+  </div>
+
+  <div class="header">
+    <h1>创建账号</h1>
+    <p>注册以开始使用全部功能</p>
+  </div>
+
+  <form class="form" id="registerForm" autocomplete="off">
+    <!-- Name -->
+    <div class="field" id="nameField">
+      <label for="name">昵称（选填）</label>
+      <div class="input-wrap">
+        <input type="text" id="name" placeholder="给自己取个名字吧" maxlength="20" autocomplete="name" />
+      </div>
+    </div>
+
+    <!-- Phone -->
+    <div class="field" id="phoneField">
+      <label for="phone">手机号</label>
+      <div class="phone-row">
+        <button type="button" class="country-pick" id="countryBtn">
+          <span id="countryCode">+86</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M2 4l3 3 3-3"/></svg>
+        </button>
+        <input type="tel" id="phone" placeholder="请输入手机号" maxlength="11" inputmode="numeric" autocomplete="tel" />
+      </div>
+      <span class="field-msg error" id="phoneError">请输入有效的手机号码</span>
+    </div>
+
+    <!-- Code -->
+    <div class="field" id="codeField">
+      <label for="code">验证码</label>
+      <div class="code-row">
+        <input type="text" id="code" placeholder="输入 6 位验证码" maxlength="6" inputmode="numeric" autocomplete="one-time-code" />
+        <button type="button" class="btn-send" id="sendBtn">发送验证码</button>
+      </div>
+      <span class="field-msg error" id="codeError">请输入 6 位验证码</span>
+      <span class="field-msg hint" id="codeHint"></span>
+    </div>
+
+    <!-- Agreement -->
+    <div class="agree-row">
+      <input type="checkbox" id="agree" />
+      <label for="agree">我已阅读并同意 <a href="#">服务条款</a> 和 <a href="#">隐私政策</a></label>
+    </div>
+
+    <button type="submit" class="btn-primary" id="submitBtn">
+      <span class="btn-text">注册</span>
+    </button>
+
+    <div class="links">
+      <a href="login.html">已有账号？去登录</a>
+    </div>
+  </form>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  (function() {
+    const form = document.getElementById('registerForm');
+    const phoneInput = document.getElementById('phone');
+    const codeInput = document.getElementById('code');
+    const sendBtn = document.getElementById('sendBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const phoneField = document.getElementById('phoneField');
+    const codeField = document.getElementById('codeField');
+    const agreeCheck = document.getElementById('agree');
+    const codeHint = document.getElementById('codeHint');
+    const toast = document.getElementById('toast');
+
+    let countdown = 0, timer = null;
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function validatePhone() {
+      const raw = phoneInput.value.replace(/\s/g, '');
+      const ok = /^1[3-9]\d{9}$/.test(raw);
+      phoneField.classList.toggle('has-error', phoneInput.value.length > 0 && !ok);
+      return ok;
+    }
+
+    function validateCode() {
+      const ok = codeInput.value.length === 6 && /^\d{6}$/.test(codeInput.value);
+      codeField.classList.toggle('has-error', codeInput.value.length > 0 && !ok);
+      return ok;
+    }
+
+    function startCountdown() {
+      countdown = 60;
+      sendBtn.disabled = true;
+      sendBtn.textContent = countdown + 's 后重发';
+      codeHint.textContent = '验证码已发送至 ' + phoneInput.value;
+      timer = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+          clearInterval(timer);
+          sendBtn.disabled = false;
+          sendBtn.textContent = '重新发送';
+          codeHint.textContent = '';
+        } else {
+          sendBtn.textContent = countdown + 's 后重发';
+        }
+      }, 1000);
+    }
+
+    sendBtn.addEventListener('click', () => {
+      if (!validatePhone()) { phoneField.classList.add('has-error'); return; }
+      phoneField.classList.remove('has-error');
+      showToast('验证码已发送');
+      startCountdown();
+      codeInput.focus();
+    });
+
+    phoneInput.addEventListener('input', validatePhone);
+    codeInput.addEventListener('input', validateCode);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let valid = true;
+
+      if (!validatePhone()) { phoneField.classList.add('has-error'); valid = false; }
+      if (!validateCode()) { codeField.classList.add('has-error'); valid = false; }
+      if (!agreeCheck.checked) { showToast('请先同意服务条款'); valid = false; }
+
+      if (!valid) return;
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span><span>注册中…</span>';
+
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="btn-text">注册</span>';
+        showToast('注册成功！');
+      }, 1500);
+    });
+  })();
+</script>
+</body>
+</html>

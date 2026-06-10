@@ -1,0 +1,52 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--surface);
+  color: var(--fg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-active); }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input {
+  font-family: inherit;
+  font-size: var(--text-base);
+  color: var(--fg);
+  border: none;
+  outline: none;
+  background: none;
+}
+
+/* shared form shell */
+.form-shell {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 0 var(--container-gutter-phone);
+}
+
+/* shared card */
+.card-auth {
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elev-raised);
+  padding: var(--space-8);
+}
+
+@media (max-width: 480px) {
+  .card-auth {
+    padding: var(--space-6) var(--space-5);
+    border-radius: var(--radius-md);
+    box-shadow: none;
+    background: transparent;
+  }
+}

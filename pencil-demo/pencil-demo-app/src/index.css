@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface-primary: #FFFFFF;
+  --color-surface-secondary: #F9F9F9;
+  --color-foreground-primary: #111827;
+  --color-foreground-secondary: #4B5563;
+  --color-border-subtle: #E5E7EB;
+  --color-accent-primary: #FACC15;
+  --color-accent-secondary: #F59E0B;
+  --color-orange-500: #F97316;
+
+  --font-heading: "Funnel Sans", sans-serif;
+  --font-body: "Geist", sans-serif;
+  --font-caption: "Inter", sans-serif;
+  --font-data: "IBM Plex Mono", monospace;
+}
+
+body {
+  margin: 0;
+}
+
+.bg-gradient-radial {
+  background: radial-gradient(
+    ellipse 120% 120% at 50% 40%,
+    var(--color-accent-primary) 0%,
+    var(--color-accent-secondary) 50%,
+    var(--color-orange-500) 100%
+  );
+}

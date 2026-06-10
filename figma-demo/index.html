@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: #08080a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Background radial gradients */
+.bg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 1920px 968px at 50% 50%, rgba(20,18,15,1) 0%, rgba(8,8,10,1) 70%),
+    radial-gradient(ellipse 1152px 774px at 80% 20%, rgba(180,140,100,0.04) 0%, rgba(0,0,0,0) 50%),
+    radial-gradient(ellipse 1536px 580px at 20% 80%, rgba(212,165,116,0.06) 0%, rgba(0,0,0,0) 60%);
+}
+
+/* Decorative blur glows */
+.glow-1 {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  left: 1320px;
+  top: 105px;
+  background: rgba(212,165,116,0.04);
+  border-radius: 150px;
+  filter: blur(80px);
+  z-index: 1;
+}
+
+.glow-2 {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  left: 197px;
+  top: 615px;
+  background: rgba(180,140,100,0.03);
+  border-radius: 100px;
+  filter: blur(80px);
+  z-index: 1;
+}
+
+/* Decorative circles - top right */
+.decorative-circles {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  left: 1680px;
+  top: -80px;
+  border: 1px solid rgba(212,165,116,0.04);
+  border-radius: 160px;
+  z-index: 1;
+}
+
+.decorative-circles::before {
+  content: '';
+  position: absolute;
+  width: 238px;
+  height: 238px;
+  left: 41px;
+  top: 41px;
+  border: 1px solid rgba(212,165,116,0.03);
+  border-radius: 119px;
+}
+
+/* Large "Sign In" watermark */
+.watermark {
+  position: absolute;
+  left: 661px;
+  top: 715px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.watermark-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: 256px;
+  line-height: 204.8px;
+  color: rgba(212,165,116,0.02);
+  letter-spacing: -7.68px;
+  white-space: nowrap;
+}
+
+/* Vertical gradient line */
+.line-vertical {
+  position: absolute;
+  width: 1px;
+  height: 387.2px;
+  left: 288px;
+  top: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(212,165,116,0.08), rgba(0,0,0,0));
+  z-index: 1;
+}
+
+/* Horizontal gradient line */
+.line-horizontal {
+  position: absolute;
+  width: 576px;
+  height: 1px;
+  left: 1344px;
+  top: 773.4px;
+  background: linear-gradient(to left, rgba(212,165,116,0.06), rgba(0,0,0,0));
+  z-index: 1;
+}
+
+/* Main content card */
+.login-card {
+  position: relative;
+  z-index: 10;
+  width: 420px;
+  height: 735px;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.login-card-inner {
+  width: 100%;
+  height: 695px;
+  background: rgba(18,18,22,0.85);
+  border: 1px solid rgba(212,165,116,0.12);
+  border-radius: 20px;
+  box-shadow:
+    0px 0px 80px 0px rgba(212,165,116,0.03),
+    0px 30px 60px 0px rgba(0,0,0,0.4);
+  padding: 49px 41px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Logo */
+.logo-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  background: #d4747f;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0px 4px 12px rgba(212,165,116,0.2));
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logo-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 22px;
+  color: #0a0a0a;
+  line-height: 1;
+}
+
+/* Heading */
+.heading-wrapper {
+  width: 100%;
+  padding-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 400;
+  font-size: 28px;
+  color: #f5f0eb;
+  letter-spacing: -0.56px;
+  white-space: nowrap;
+  line-height: 34px;
+}
+
+/* Subtitle */
+.subtitle-wrapper {
+  width: 100%;
+  padding-top: 6px;
+  display: flex;
+  justify-content: center;
+}
+
+.subtitle {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  color: #5a5550;
+  letter-spacing: 0.52px;
+  white-space: nowrap;
+}
+
+/* Form */
+.form {
+  width: 298px;
+  padding-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Form group */
+.form-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form-group + .form-group {
+  padding-top: 20px;
+}
+
+.form-label {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  color: #8a8580;
+  letter-spacing: 0.88px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 14px;
+}
+
+.input-wrapper {
+  width: 100%;
+  padding-top: 8px;
+}
+
+.form-input {
+  width: 298px;
+  height: 48px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 0 17px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  color: #f5f0eb;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.form-input::placeholder {
+  color: #5a5550;
+}
+
+.form-input:focus {
+  border-color: rgba(212,165,116,0.3);
+  background: rgba(255,255,255,0.06);
+}
+
+/* Password field */
+.password-field {
+  position: relative;
+  width: 298px;
+}
+
+.password-field .form-input {
+  width: 100%;
+  padding-right: 51px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #5a5550;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+  color: #8a8580;
+}
+
+/* Options row */
+.options-row {
+  width: 298px;
+  height: 65px;
+  padding: 20px 0 28px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-visual {
+  width: 16px;
+  height: 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + .checkbox-visual {
+  background: rgba(212,165,116,0.15);
+  border-color: rgba(212,165,116,0.3);
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + .checkbox-visual::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: #d4a574;
+  border-radius: 1px;
+}
+
+.checkbox-text {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #8a8580;
+  line-height: 15px;
+}
+
+.forgot-link {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #d4a574;
+  text-decoration: none;
+  line-height: 15px;
+  transition: color 0.2s ease;
+}
+
+.forgot-link:hover {
+  color: #dfb88a;
+}
+
+/* Login button */
+.btn-login-wrapper {
+  width: 298px;
+  height: 50px;
+  position: relative;
+}
+
+.btn-login {
+  width: 298px;
+  height: 50px;
+  background: #cfd474;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #0a0a0a;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.btn-login:hover {
+  background: #d9de82;
+}
+
+.btn-login:active {
+  transform: scale(0.99);
+}
+
+/* Divider */
+.divider {
+  width: 298px;
+  height: 43px;
+  padding-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  min-width: 1px;
+}
+
+.divider-text {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: #5a5550;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 14px;
+}
+
+/* Social buttons */
+.social-row {
+  width: 298px;
+  height: 72px;
+  padding-top: 28px;
+  display: flex;
+  gap: 12px;
+}
+
+.btn-social {
+  flex: 1;
+  height: 44px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  min-width: 0;
+}
+
+.btn-social:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.btn-social svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.btn-social-text {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #8a8580;
+  white-space: nowrap;
+}
+
+/* Sign up text */
+.signup-text {
+  width: 298px;
+  height: 43px;
+  padding-top: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.signup-text-content {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #5a5550;
+  white-space: nowrap;
+}
+
+.signup-text-content a {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: #d4a574;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.signup-text-content a:hover {
+  color: #dfb88a;
+}
+</style>
+</head>
+<body>
+
+<!-- Background layer -->
+<div class="bg-layer"></div>
+
+<!-- Decorative blur glows -->
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+
+<!-- Decorative circles -->
+<div class="decorative-circles"></div>
+
+<!-- Large "Sign In" watermark -->
+<div class="watermark">
+  <span class="watermark-text">Sign In</span>
+</div>
+
+<!-- Gradient lines -->
+<div class="line-vertical"></div>
+<div class="line-horizontal"></div>
+
+<!-- Main login card -->
+<div class="login-card">
+  <div class="login-card-inner">
+
+    <!-- Logo -->
+    <div class="logo-wrapper">
+      <div class="logo">
+        <span class="logo-text">A</span>
+      </div>
+    </div>
+
+    <!-- Heading -->
+    <div class="heading-wrapper">
+      <h1 class="heading">Welcome Back</h1>
+    </div>
+
+    <!-- Subtitle -->
+    <div class="subtitle-wrapper">
+      <p class="subtitle">请登录你的账号以继续</p>
+    </div>
+
+    <!-- Form -->
+    <div class="form">
+
+      <!-- Email -->
+      <div class="form-group">
+        <label class="form-label">邮箱地址</label>
+        <div class="input-wrapper">
+          <input type="email" class="form-input" placeholder="name@example.com">
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label class="form-label">密码</label>
+        <div class="input-wrapper">
+          <div class="password-field">
+            <input type="password" class="form-input" placeholder="输入你的密码" id="password-input">
+            <button type="button" class="toggle-password" id="toggle-pwd">显示</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Options row -->
+      <div class="options-row">
+        <label class="checkbox-wrapper">
+          <input type="checkbox">
+          <span class="checkbox-visual"></span>
+          <span class="checkbox-text">记住我</span>
+        </label>
+        <a href="#" class="forgot-link">忘记密码?</a>
+      </div>
+
+      <!-- Login button -->
+      <div class="btn-login-wrapper">
+        <button class="btn-login">登 录</button>
+      </div>
+
+    </div>
+
+    <!-- Divider -->
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-text">或</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- Social buttons -->
+    <div class="social-row">
+      <button class="btn-social">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0)">
+            <path d="M15.04 8.16667C15.04 7.64667 14.9933 7.14667 14.9067 6.66667H8V9.50667H11.9467C11.8646 9.95562 11.6924 10.3833 11.4403 10.7637C11.1882 11.1441 10.8615 11.4695 10.48 11.72V13.5667H12.86C14.2467 12.2867 15.0467 10.4067 15.0467 8.16667H15.04Z" fill="#8A8580"/>
+            <path d="M8 15.3333C9.98 15.3333 11.64 14.68 12.8533 13.56L10.4733 11.7133C9.82 12.1533 8.98667 12.42 8 12.42C6.09333 12.42 4.47333 11.1333 3.89333 9.4H1.45333V11.2933C2.66 13.6867 5.13333 15.3333 8 15.3333Z" fill="#8A8580"/>
+            <path d="M3.89333 9.39333C3.74667 8.95333 3.66 8.48667 3.66 8C3.66 7.51333 3.74667 7.04667 3.89333 6.60667V4.71333H1.45333C0.953333 5.7 0.666666 6.81333 0.666666 8C0.666666 9.18667 0.953333 10.3 1.45333 11.2867L3.35333 9.80667L3.89333 9.39333Z" fill="#8A8580"/>
+            <path d="M8 3.58667C9.08 3.58667 10.04 3.96 10.8067 4.68L12.9067 2.58C11.6333 1.39333 9.98 0.666666 8 0.666666C5.13333 0.666666 2.66 2.31333 1.45333 4.71333L3.89333 6.60667C4.47333 4.87333 6.09333 3.58667 8 3.58667Z" fill="#8A8580"/>
+          </g>
+          <defs>
+            <clipPath id="clip0">
+              <rect width="16" height="16" fill="white"/>
+            </clipPath>
+          </defs>
+        </svg>
+        <span class="btn-social-text">Google</span>
+      </button>
+
+      <button class="btn-social">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <path d="M8 1.33333C4.318 1.33333 1.33333 4.32267 1.33333 8.01133C1.33333 10.9613 3.24333 13.4647 5.89267 14.3473C6.226 14.4087 6.34733 14.2027 6.34733 14.0253C6.34733 13.8673 6.342 13.4467 6.33867 12.89C4.484 13.2933 4.09267 11.9947 4.09267 11.9947C3.79 11.2227 3.35267 11.0173 3.35267 11.0173C2.74733 10.604 3.39867 10.612 3.39867 10.612C4.06733 10.6587 4.41933 11.3 4.41933 11.3C5.014 12.32 5.98 12.0253 6.35933 11.8547C6.42067 11.4233 6.59267 11.1293 6.78333 10.9627C5.30333 10.794 3.74667 10.2207 3.74667 7.662C3.74667 6.93333 4.00667 6.33667 4.43267 5.87C4.364 5.70133 4.13533 5.022 4.498 4.10333C4.498 4.10333 5.058 3.92333 6.33133 4.78733C6.87518 4.63901 7.43629 4.56346 8 4.56267C8.56667 4.56533 9.13667 4.63933 9.66933 4.78733C10.942 3.92333 11.5007 4.10267 11.5007 4.10267C11.8647 5.022 11.6353 5.70133 11.5673 5.87C11.994 6.33667 12.2527 6.93333 12.2527 7.662C12.2527 10.2273 10.6933 10.792 9.20867 10.9573C9.448 11.1633 9.66067 11.5707 9.66067 12.194C9.66067 13.086 9.65267 13.8067 9.65267 14.0253C9.65267 14.204 9.77267 14.412 10.1113 14.3467C11.4389 13.9014 12.5929 13.0502 13.4103 11.9134C14.2277 10.7765 14.6672 9.41154 14.6667 8.01133C14.6667 4.32267 11.6813 1.33333 8 1.33333Z" fill="#8A8580"/>
+          </g>
+        </svg>
+        <span class="btn-social-text">GitHub</span>
+      </button>
+
+      <button class="btn-social">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <path d="M12.4733 13C11.92 13.8267 11.3333 14.6333 10.44 14.6467C9.54667 14.6667 9.26 14.12 8.24667 14.12C7.22667 14.12 6.91333 14.6333 6.06667 14.6667C5.19333 14.7 4.53333 13.7867 3.97333 12.98C2.83333 11.3333 1.96 8.3 3.13333 6.26C3.71333 5.24667 4.75333 4.60667 5.88 4.58667C6.73333 4.57333 7.54667 5.16667 8.07333 5.16667C8.59333 5.16667 9.58 4.45333 10.6067 4.56C11.04 4.58 12.2533 4.73333 13.0333 5.88C12.9733 5.92 11.5867 6.73333 11.6 8.42C11.62 10.4333 13.3667 11.1067 13.3867 11.1133C13.3667 11.16 13.1067 12.0733 12.4667 13M8.66667 2.33333C9.15333 1.78 9.96 1.36 10.6267 1.33333C10.7133 2.11333 10.4 2.9 9.93333 3.46C9.47333 4.02667 8.71333 4.46667 7.96667 4.40667C7.86667 3.64 8.24 2.84 8.66667 2.33333Z" fill="#8A8580"/>
+          </g>
+        </svg>
+        <span class="btn-social-text">Apple</span>
+      </button>
+    </div>
+
+    <!-- Sign up text -->
+    <div class="signup-text">
+      <p class="signup-text-content">还没有账号？<a href="#">立即注册</a></p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Toggle password visibility
+const toggleBtn = document.getElementById('toggle-pwd');
+const passwordInput = document.getElementById('password-input');
+
+toggleBtn.addEventListener('click', () => {
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    toggleBtn.textContent = '隐藏';
+  } else {
+    passwordInput.type = 'password';
+    toggleBtn.textContent = '显示';
+  }
+});
+</script>
+
+</body>
+</html>

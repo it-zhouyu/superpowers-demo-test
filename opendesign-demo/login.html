@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>登录</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface-warm: #fbfbfd;
+    --fg: #1d1d1f;
+    --fg-2: #424245;
+    --muted: #6e6e73;
+    --meta: #86868b;
+    --border: #d2d2d7;
+    --border-soft: #e8e8ed;
+    --accent: #0071e3;
+    --accent-on: #ffffff;
+    --accent-hover: #0077ed;
+    --accent-active: #0066cc;
+    --error: #dc2626;
+    --success: #16a34a;
+    --font-display: "SF Pro Display", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-body: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-pill: 980px;
+    --motion-fast: 150ms;
+    --motion-base: 220ms;
+    --ease-standard: cubic-bezier(0.28, 0, 0.22, 1);
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
+    --container-max: 1024px;
+    --container-gutter-desktop: 22px;
+    --container-gutter-tablet: 18px;
+    --container-gutter-phone: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--surface);
+    color: var(--fg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg);
+    border-radius: var(--radius-lg);
+    padding: 40px 36px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  /* Logo */
+  .logo-area {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+  .logo {
+    width: 48px; height: 48px;
+    background: var(--accent);
+    border-radius: var(--radius-md);
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo svg { width: 26px; height: 26px; fill: white; }
+  .app-name {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: var(--space-8); }
+  .header h1 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--fg);
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.47;
+  }
+
+  /* Form */
+  .form { display: flex; flex-direction: column; gap: 18px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  /* Phone row */
+  .phone-row { display: flex; gap: 8px; }
+  .country-pick {
+    width: 92px; min-width: 92px;
+    height: 48px;
+    padding: 0 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    color: var(--fg);
+    background: var(--bg);
+    display: flex; align-items: center; gap: 6px;
+    cursor: pointer;
+    transition: border-color var(--motion-fast) var(--ease-standard);
+    font-family: var(--font-body);
+  }
+  .country-pick:hover { border-color: var(--meta); }
+  .phone-row input {
+    flex: 1;
+    height: 48px;
+    padding: 0 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    color: var(--fg);
+    background: var(--bg);
+    font-family: var(--font-body);
+    transition: border-color var(--motion-fast) var(--ease-standard);
+  }
+  .phone-row input:focus,
+  .country-pick:focus { outline: none; border-color: var(--accent); }
+  .phone-row input::placeholder { color: var(--meta); }
+
+  /* Code row */
+  .code-row { display: flex; gap: 8px; }
+  .code-row input {
+    flex: 1;
+    height: 48px;
+    padding: 0 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    color: var(--fg);
+    background: var(--bg);
+    font-family: var(--font-body);
+    letter-spacing: 0.15em;
+    text-align: center;
+    transition: border-color var(--motion-fast) var(--ease-standard);
+  }
+  .code-row input:focus { outline: none; border-color: var(--accent); }
+  .code-row input::placeholder { color: var(--meta); letter-spacing: 0; }
+
+  .btn-send {
+    min-width: 120px;
+    height: 48px;
+    padding: 0 14px;
+    border: 1.5px solid var(--accent);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--font-body);
+    white-space: nowrap;
+    transition: all var(--motion-fast) var(--ease-standard);
+  }
+  .btn-send:hover { background: color-mix(in oklab, var(--accent), transparent 92%); }
+  .btn-send:disabled {
+    border-color: var(--border);
+    color: var(--muted);
+    cursor: not-allowed;
+    background: transparent;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    width: 100%;
+    height: 50px;
+    background: var(--accent);
+    color: var(--accent-on);
+    border: none;
+    border-radius: var(--radius-pill);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: var(--font-body);
+    transition: background-color var(--motion-fast) var(--ease-standard);
+    margin-top: 2px;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:active { background: var(--accent-active); }
+  .btn-primary:disabled {
+    background: #a1c6f0;
+    cursor: not-allowed;
+  }
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Links */
+  .links {
+    display: flex; justify-content: center; gap: 24px;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  .links a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .links a:hover { text-decoration: underline; }
+
+  /* Error */
+  .field-msg {
+    font-size: 12px;
+    margin-top: 2px;
+    display: none;
+  }
+  .field.has-error input,
+  .field.has-error .country-pick { border-color: var(--error); }
+  .field.has-error .field-msg.error { display: block; color: var(--error); }
+  .field-msg.hint { display: block; color: var(--muted); }
+
+  /* Divider */
+  .divider {
+    display: flex; align-items: center; gap: 16px;
+    color: var(--muted); font-size: 13px; margin: 4px 0;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border-soft);
+  }
+
+  /* Social */
+  .social { display: flex; gap: 12px; }
+  .social-btn {
+    flex: 1; height: 48px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 14px; font-weight: 500;
+    color: var(--fg);
+    font-family: var(--font-body);
+    transition: background-color var(--motion-fast) var(--ease-standard);
+  }
+  .social-btn:hover { background: var(--surface); }
+  .social-btn svg { width: 20px; height: 20px; }
+
+  /* Toast */
+  .toast {
+    position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--fg); color: white;
+    padding: 12px 24px; border-radius: var(--radius-pill);
+    font-size: 14px; font-weight: 500;
+    opacity: 0; transition: opacity var(--motion-base) var(--ease-standard);
+    pointer-events: none; z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    body { padding: 16px; align-items: flex-start; padding-top: 60px; }
+    .card { padding: 32px 24px; border-radius: var(--radius-md); box-shadow: none; }
+    .header h1 { font-size: 24px; }
+    .links { flex-direction: column; align-items: center; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-area">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="white" stroke-width="2"/><path d="M12 6v6l4 2" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="app-name">流</div>
+  </div>
+
+  <div class="header">
+    <h1>欢迎回来</h1>
+    <p>使用手机号登录你的账号</p>
+  </div>
+
+  <form class="form" id="loginForm" autocomplete="off">
+    <!-- Phone -->
+    <div class="field" id="phoneField">
+      <label for="phone">手机号</label>
+      <div class="phone-row">
+        <button type="button" class="country-pick" id="countryBtn">
+          <span id="countryCode">+86</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M2 4l3 3 3-3"/></svg>
+        </button>
+        <input type="tel" id="phone" placeholder="请输入手机号" maxlength="11" inputmode="numeric" autocomplete="tel" />
+      </div>
+      <span class="field-msg error" id="phoneError">请输入有效的手机号码</span>
+    </div>
+
+    <!-- Code -->
+    <div class="field" id="codeField">
+      <label for="code">验证码</label>
+      <div class="code-row">
+        <input type="text" id="code" placeholder="输入 6 位验证码" maxlength="6" inputmode="numeric" autocomplete="one-time-code" />
+        <button type="button" class="btn-send" id="sendBtn">发送验证码</button>
+      </div>
+      <span class="field-msg error" id="codeError">请输入 6 位验证码</span>
+      <span class="field-msg hint" id="codeHint"></span>
+    </div>
+
+    <button type="submit" class="btn-primary" id="submitBtn">
+      <span class="btn-text">登录</span>
+    </button>
+
+    <div class="divider">其他方式</div>
+
+    <div class="social">
+      <button type="button" class="social-btn" id="appleLogin">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.025-1.632 2.815-.181.79-.065 1.62.116 2.43.143.4.367.78.666 1.106.315.345.69.647 1.114.918.927.568 2.013.858 3.183.955 1.18.098 2.063-.018 2.94-.123 1.05-.126 1.92-.78 2.528-1.54 1.12-1.38 1.62-3.24 1.337-4.6z"/></svg>
+        Apple
+      </button>
+      <button type="button" class="social-btn" id="googleLogin">
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Google
+      </button>
+    </div>
+
+    <div class="links">
+      <a href="register.html">还没有账号？去注册</a>
+      <a href="forgot-password.html">忘记密码？</a>
+    </div>
+  </form>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  (function() {
+    const form = document.getElementById('loginForm');
+    const phoneInput = document.getElementById('phone');
+    const codeInput = document.getElementById('code');
+    const sendBtn = document.getElementById('sendBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const phoneField = document.getElementById('phoneField');
+    const codeField = document.getElementById('codeField');
+    const phoneError = document.getElementById('phoneError');
+    const codeError = document.getElementById('codeError');
+    const codeHint = document.getElementById('codeHint');
+    const toast = document.getElementById('toast');
+
+    let countdown = 0;
+    let timer = null;
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function validatePhone() {
+      const raw = phoneInput.value.replace(/\s/g, '');
+      const ok = /^1[3-9]\d{9}$/.test(raw);
+      phoneField.classList.toggle('has-error', phoneInput.value.length > 0 && !ok);
+      return ok;
+    }
+
+    function validateCode() {
+      const ok = codeInput.value.length === 6 && /^\d{6}$/.test(codeInput.value);
+      codeField.classList.toggle('has-error', codeInput.value.length > 0 && !ok);
+      return ok;
+    }
+
+    function startCountdown() {
+      countdown = 60;
+      sendBtn.disabled = true;
+      sendBtn.textContent = countdown + 's 后重发';
+      codeHint.textContent = '验证码已发送至 ' + phoneInput.value;
+      timer = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+          clearInterval(timer);
+          sendBtn.disabled = false;
+          sendBtn.textContent = '重新发送';
+          codeHint.textContent = '';
+        } else {
+          sendBtn.textContent = countdown + 's 后重发';
+        }
+      }, 1000);
+    }
+
+    sendBtn.addEventListener('click', () => {
+      if (!validatePhone()) {
+        phoneField.classList.add('has-error');
+        return;
+      }
+      phoneField.classList.remove('has-error');
+      showToast('验证码已发送');
+      startCountdown();
+      codeInput.focus();
+    });
+
+    phoneInput.addEventListener('input', validatePhone);
+    codeInput.addEventListener('input', validateCode);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let valid = true;
+
+      if (!validatePhone()) { phoneField.classList.add('has-error'); valid = false; }
+      if (!validateCode()) { codeField.classList.add('has-error'); valid = false; }
+
+      if (!valid) return;
+
+      // Loading state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span><span>登录中…</span>';
+
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="btn-text">登录</span>';
+        showToast('登录成功！');
+      }, 1500);
+    });
+
+    // Social login demo
+    document.getElementById('appleLogin').addEventListener('click', () => showToast('Apple 登录（演示）'));
+    document.getElementById('googleLogin').addEventListener('click', () => showToast('Google 登录（演示）'));
+  })();
+</script>
+</body>
+</html>
