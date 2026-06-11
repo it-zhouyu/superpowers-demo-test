@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE 流式聊天 Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---- 顶部标题栏 ---- */
+        .header {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header .badge {
+            background: #e94560;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
+        .btn-clear {
+            background: transparent;
+            color: #aaa;
+            border: 1px solid #444;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-clear:hover {
+            color: #fff;
+            border-color: #888;
+        }
+
+        /* ---- 聊天消息区域 ---- */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.user .avatar {
+            background: #e94560;
+        }
+
+        .message.assistant .avatar {
+            background: #1a1a2e;
+        }
+
+        .bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            line-height: 1.6;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .message.user .bubble {
+            background: #1a1a2e;
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .bubble {
+            background: #fff;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ---- 工具调用气泡 ---- */
+        .tool-bubble {
+            background: #fff8e1;
+            border-left: 3px solid #ffc107;
+            padding: 8px 12px;
+            margin: 4px 0 4px 46px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .tool-bubble .tool-name {
+            font-weight: 600;
+            color: #e65100;
+        }
+
+        .tool-bubble .tool-result {
+            color: #2e7d32;
+            margin-top: 4px;
+        }
+
+        /* ---- 打字光标动画 ---- */
+        .typing-cursor::after {
+            content: "▊";
+            animation: blink 0.8s infinite;
+            color: #999;
+            font-size: 13px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* ---- 输入区域 ---- */
+        .input-area {
+            background: #fff;
+            border-top: 1px solid #e0e0e0;
+            padding: 16px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-wrapper input:focus {
+            border-color: #1a1a2e;
+        }
+
+        .input-wrapper input:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .btn-send {
+            background: #1a1a2e;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-send:hover {
+            background: #16213e;
+        }
+
+        .btn-send:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        /* ---- 连接状态指示器 ---- */
+        .status-bar {
+            text-align: center;
+            padding: 4px;
+            font-size: 12px;
+            color: #999;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-bar.streaming {
+            color: #e94560;
+            background: #fff5f5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部标题栏 -->
+    <div class="header">
+        <div style="display: flex; align-items: center;">
+            <h1>SSE 流式聊天</h1>
+            <span class="badge">Demo</span>
+        </div>
+        <button class="btn-clear" onclick="clearChat()">清除对话</button>
+    </div>
+
+    <!-- 连接状态 -->
+    <div class="status-bar" id="statusBar">就绪 · 输入消息开始对话</div>
+
+    <!-- 聊天消息区域 -->
+    <div class="chat-container" id="chatContainer"></div>
+
+    <!-- 输入区域 -->
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input
+                type="text"
+                id="messageInput"
+                placeholder="输入消息，例如：北京今天天气怎么样？"
+                autocomplete="off"
+            />
+            <button class="btn-send" id="sendBtn" onclick="sendMessage()">发送</button>
+        </div>
+    </div>
+
+    <script>
+        // ---- 全局状态 ----
+        const sessionId = 'session_' + Math.random().toString(36).substring(2, 10);
+        let isStreaming = false;  // 是否正在接收 SSE 流
+
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const statusBar = document.getElementById('statusBar');
+
+        // 回车键发送消息
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // ---- 发送消息 ----
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message || isStreaming) return;
+
+            // 添加用户消息气泡
+            addMessage('user', message);
+            messageInput.value = '';
+            setStreaming(true);
+
+            // 当前 AI 消息的气泡元素（流式追加内容）
+            let currentBubble = null;
+
+            // ---- 使用 fetch + ReadableStream 消费 SSE ----
+            //
+            // 这里没有使用浏览器原生的 EventSource API，原因：
+            // 1. EventSource 只支持 GET 请求，无法发送 POST 请求体
+            // 2. EventSource 不能自定义请求头
+            // 3. 前端需要发送 JSON 格式的消息，只能用 POST
+            //
+            // 所以我们用 fetch + ReadableStream 手动解析 SSE 格式
+            fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: message,
+                    session_id: sessionId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                // response.body 是一个 ReadableStream
+                // 我们用 getReader() 逐块读取，手动解析 SSE 事件
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';  // 缓冲区，用于拼接不完整的 SSE 行
+
+                // 递归读取流
+                function read() {
+                    reader.read().then(({ done, value }) => {
+                        if (done) {
+                            // 流结束，移除打字光标
+                            removeCursor(currentBubble);
+                            setStreaming(false);
+                            return;
+                        }
+
+                        // 将二进制数据解码为文本，拼接到缓冲区
+                        buffer += decoder.decode(value, { stream: true });
+
+                        // SSE 协议以 \n\n 分隔事件，按双换行拆分
+                        const parts = buffer.split('\n\n');
+                        // 最后一部分可能不完整，留在缓冲区等下次拼接
+                        buffer = parts.pop() || '';
+
+                        for (const part of parts) {
+                            if (!part.trim()) continue;
+
+                            // 解析 SSE 事件
+                            const event = parseSSE(part);
+
+                            if (event) {
+                                switch (event.event) {
+                                    case 'content':
+                                        // 文本内容增量
+                                        if (!currentBubble) {
+                                            currentBubble = addMessage('assistant', '');
+                                        }
+                                        appendText(currentBubble, event.data.text);
+                                        break;
+
+                                    case 'tool_call':
+                                        // 工具调用通知
+                                        removeCursor(currentBubble);
+                                        addToolCall(event.data.name, event.data.arguments);
+                                        break;
+
+                                    case 'tool_result':
+                                        // 工具执行结果
+                                        addToolResult(event.data.name, event.data.result);
+                                        break;
+
+                                    case 'done':
+                                        // 整轮对话完成
+                                        removeCursor(currentBubble);
+                                        // 如果 LLM 只调用了工具没有文本内容，done 事件会携带最终内容
+                                        if (event.data.content && !currentBubble) {
+                                            currentBubble = addMessage('assistant', event.data.content);
+                                        }
+                                        break;
+
+                                    case 'error':
+                                        // 错误事件
+                                        removeCursor(currentBubble);
+                                        if (!currentBubble) {
+                                            currentBubble = addMessage('assistant', '');
+                                        }
+                                        appendText(currentBubble, '❌ ' + event.data.message);
+                                        break;
+                                }
+                            }
+                        }
+
+                        // 继续读取下一块
+                        read();
+                    });
+                }
+
+                read();
+            })
+            .catch(err => {
+                removeCursor(currentBubble);
+                if (!currentBubble) {
+                    currentBubble = addMessage('assistant', '');
+                }
+                appendText(currentBubble, '❌ 请求失败: ' + err.message);
+                setStreaming(false);
+            });
+        }
+
+        // ---- 解析 SSE 文本块 ----
+        // SSE 格式示例：
+        //   event: content
+        //   data: {"text": "你好"}
+        function parseSSE(text) {
+            const lines = text.split('\n');
+            let event = '';
+            let data = '';
+
+            for (const line of lines) {
+                if (line.startsWith('event: ')) {
+                    event = line.substring(7).trim();
+                } else if (line.startsWith('data: ')) {
+                    data = line.substring(6);
+                }
+            }
+
+            if (!event || !data) return null;
+
+            try {
+                return { event, data: JSON.parse(data) };
+            } catch {
+                return { event, data: { raw: data } };
+            }
+        }
+
+        // ---- UI 辅助函数 ----
+
+        // 添加一条消息（用户或 AI）
+        function addMessage(role, content) {
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = role === 'user' ? '👤' : '🤖';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble typing-cursor';
+            bubble.textContent = content;
+
+            div.appendChild(avatar);
+            div.appendChild(bubble);
+            chatContainer.appendChild(div);
+            scrollToBottom();
+
+            return bubble;
+        }
+
+        // 向气泡追加文本（流式）
+        function appendText(bubble, text) {
+            if (!bubble) return;
+            bubble.textContent += text;
+            scrollToBottom();
+        }
+
+        // 移除打字光标
+        function removeCursor(bubble) {
+            if (bubble) {
+                bubble.classList.remove('typing-cursor');
+            }
+        }
+
+        // 添加工具调用提示
+        function addToolCall(name, args) {
+            const div = document.createElement('div');
+            div.className = 'tool-bubble';
+            const argsStr = Object.entries(args).map(([k, v]) => `${k}="${v}"`).join(', ');
+            div.innerHTML = `🔧 调用工具: <span class="tool-name">${name}(${argsStr})</span>`;
+            chatContainer.appendChild(div);
+            scrollToBottom();
+        }
+
+        // 添加工具结果提示
+        function addToolResult(name, result) {
+            const div = document.createElement('div');
+            div.className = 'tool-bubble';
+            div.innerHTML = `📡 <span class="tool-name">${name}</span> 返回: <span class="tool-result">${result}</span>`;
+            chatContainer.appendChild(div);
+            scrollToBottom();
+        }
+
+        // 设置流式状态
+        function setStreaming(streaming) {
+            isStreaming = streaming;
+            sendBtn.disabled = streaming;
+            messageInput.disabled = streaming;
+
+            if (streaming) {
+                statusBar.textContent = '⏳ 正在接收 SSE 流...';
+                statusBar.className = 'status-bar streaming';
+            } else {
+                statusBar.textContent = '就绪 · 输入消息开始对话';
+                statusBar.className = 'status-bar';
+            }
+        }
+
+        // 清除对话
+        function clearChat() {
+            chatContainer.innerHTML = '';
+
+            fetch('/clear', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: sessionId })
+            });
+        }
+
+        // 滚动到底部
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
