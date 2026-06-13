@@ -3,6 +3,7 @@ package com.example.auth.service;
 import com.example.auth.model.CodeEntry;
 import com.example.auth.model.User;
 import com.example.auth.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -33,6 +34,7 @@ public class AuthService {
         };
     }
 
+    @Autowired
     public AuthService(SmsService smsService, JwtUtil jwtUtil) {
         this.smsService = smsService;
         this.jwtUtil = jwtUtil;
