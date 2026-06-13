@@ -18,6 +18,7 @@ public class AuthService {
 
     private static final long CODE_EXPIRE_MINUTES = 5;
     private static final long CODE_COOLDOWN_SECONDS = 60;
+    private static final int MAX_LOGIN_ATTEMPTS = 5;
     private static final Random RANDOM = new Random();
 
     private final ConcurrentHashMap<String, CodeEntry> codeMap = new ConcurrentHashMap<>();
@@ -70,6 +71,11 @@ public class AuthService {
         }
 
         if (!entry.getCode().equals(inputCode)) {
+            entry.incrementAttemptCount();
+            if (entry.getAttemptCount() >= MAX_LOGIN_ATTEMPTS) {
+                codeMap.remove(phone);
+                throw new RuntimeException("验证码错误次数过多，请重新获取验证码");
+            }
             throw new RuntimeException("验证码错误");
         }
 

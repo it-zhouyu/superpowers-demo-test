@@ -113,4 +113,26 @@ class AuthServiceTest {
                 () -> authService.login("13800138000", code));
         assertEquals("验证码已过期，请重新获取", ex.getMessage());
     }
+
+    @Test
+    void login_maxAttemptsExceeded_shouldInvalidateCode() {
+        authService.sendCode("13800138000");
+
+        // 连续错误 4 次仍返回"验证码错误"
+        for (int i = 0; i < 4; i++) {
+            RuntimeException ex = assertThrows(RuntimeException.class,
+                    () -> authService.login("13800138000", "000000"));
+            assertEquals("验证码错误", ex.getMessage());
+        }
+
+        // 第 5 次错误：验证码被删除，返回"错误次数过多"
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> authService.login("13800138000", "000000"));
+        assertEquals("验证码错误次数过多，请重新获取验证码", ex.getMessage());
+
+        // 再次登录应返回"验证码无效"（已被删除）
+        RuntimeException ex2 = assertThrows(RuntimeException.class,
+                () -> authService.login("13800138000", "000000"));
+        assertEquals("验证码无效，请先获取验证码", ex2.getMessage());
+    }
 }
