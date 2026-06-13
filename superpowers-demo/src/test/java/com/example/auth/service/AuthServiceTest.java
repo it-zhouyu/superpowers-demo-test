@@ -1,10 +1,14 @@
 package com.example.auth.service;
 
+import com.example.auth.model.CodeEntry;
 import com.example.auth.util.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -88,5 +92,25 @@ class AuthServiceTest {
         RuntimeException ex = assertThrows(RuntimeException.class,
                 () -> authService.login("13800138000", code));
         assertEquals("验证码无效，请先获取验证码", ex.getMessage());
+    }
+
+    @Test
+    void login_expiredCode_shouldThrow() throws Exception {
+        authService.sendCode("13800138000");
+        String code = authService.getCodeForPhone("13800138000");
+
+        // 通过反射获取 codeMap，将验证码设置为已过期
+        Field codeMapField = AuthService.class.getDeclaredField("codeMap");
+        codeMapField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        ConcurrentHashMap<String, CodeEntry> codeMap =
+                (ConcurrentHashMap<String, CodeEntry>) codeMapField.get(authService);
+        codeMap.put("13800138000", new CodeEntry(code,
+                LocalDateTime.now().minusMinutes(10),
+                LocalDateTime.now().minusMinutes(5)));
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> authService.login("13800138000", code));
+        assertEquals("验证码已过期，请重新获取", ex.getMessage());
     }
 }
