@@ -1,0 +1,6 @@
+server:
+  port: 8080
+
+jwt:
+  secret: my-demo-secret-key-for-phone-auth-api-2024-please-replace-in-production
+  expiration: 86400000
