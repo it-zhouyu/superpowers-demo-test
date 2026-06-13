@@ -1,0 +1,92 @@
+package com.example.auth.service;
+
+import com.example.auth.util.JwtUtil;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class AuthServiceTest {
+
+    private AuthService authService;
+
+    @BeforeEach
+    void setUp() {
+        JwtUtil jwtUtil = new JwtUtil();
+        jwtUtil.setSecret("test-secret-key-for-unit-testing-must-be-long-enough");
+        jwtUtil.setExpiration(86400000L);
+
+        authService = new AuthService(jwtUtil);
+    }
+
+    // ===== sendCode 测试 =====
+
+    @Test
+    void sendCode_firstRequest_shouldSucceed() {
+        assertDoesNotThrow(() -> authService.sendCode("13800138000"));
+    }
+
+    @Test
+    void sendCode_samePhoneWithin60Seconds_shouldThrow() {
+        authService.sendCode("13800138000");
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> authService.sendCode("13800138000"));
+        assertEquals("发送验证码太频繁，请稍后再试", ex.getMessage());
+    }
+
+    // ===== login 测试 =====
+
+    @Test
+    void login_validCode_shouldReturnTokenAndNewUser() {
+        authService.sendCode("13800138000");
+        String code = authService.getCodeForPhone("13800138000");
+
+        Map<String, Object> result = authService.login("13800138000", code);
+
+        assertNotNull(result.get("token"));
+        assertEquals(true, result.get("isNewUser"));
+    }
+
+    @Test
+    void login_noCodeSent_shouldThrow() {
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> authService.login("13800138000", "123456"));
+        assertEquals("验证码无效，请先获取验证码", ex.getMessage());
+    }
+
+    @Test
+    void login_wrongCode_shouldThrow() {
+        authService.sendCode("13800138000");
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> authService.login("13800138000", "000000"));
+        assertEquals("验证码错误", ex.getMessage());
+    }
+
+    @Test
+    void login_existingUser_shouldReturnIsNewUserFalse() {
+        authService.sendCode("13800138000");
+        String code = authService.getCodeForPhone("13800138000");
+        authService.login("13800138000", code);
+
+        authService.sendCode("13800138000");
+        String code2 = authService.getCodeForPhone("13800138000");
+        Map<String, Object> result = authService.login("13800138000", code2);
+
+        assertEquals(false, result.get("isNewUser"));
+    }
+
+    @Test
+    void login_codeUsedTwice_shouldThrow() {
+        authService.sendCode("13800138000");
+        String code = authService.getCodeForPhone("13800138000");
+        authService.login("13800138000", code);
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> authService.login("13800138000", code));
+        assertEquals("验证码无效，请先获取验证码", ex.getMessage());
+    }
+}
